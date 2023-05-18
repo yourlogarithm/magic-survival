@@ -4,52 +4,53 @@ using UnityEngine;
 
 namespace Entities
 {
-    public class Player : Entity
+    public class Player : MilitantEntity
     {
-        [SerializeField] private float cooldown = 0.5f;
         [SerializeField] private Transform firePoint;
         [SerializeField] private Projectile projectilePrefab;
         [SerializeField] private Camera mainCamera;
 
-
-        private bool _canAttack = true;
         private float _moveInputX;
         private float _moveInputY;
-    
-        private static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
-
-        private void Update()
+        
+        protected void FixedUpdate()
         {
             Move();
-            Combat();
-            Rigidbody2D.velocity = Vector2.zero;
         }
 
         private void Move()
         {
+            if (Dead)
+                return;
+            
             _moveInputX = Input.GetAxisRaw("Horizontal");
             _moveInputY = Input.GetAxisRaw("Vertical");
         
             if (_moveInputX != 0 || _moveInputY != 0)
-                Animator.SetBool(IsRunning, true);
+                Animator_.SetBool(IsRunning, true);
             else
-                Animator.SetBool(IsRunning, false);
+                Animator_.SetBool(IsRunning, false);
         
             if (_moveInputX > 0)
-                SpriteRenderer.flipX = false;
+                SpriteRenderer_.flipX = false;
             else if (_moveInputX < 0)
-                SpriteRenderer.flipX = true;
+                SpriteRenderer_.flipX = true;
+            if (_moveInputX != 0 && _moveInputY != 0)
+            {
+                _moveInputX /= 1.5f;
+                _moveInputY /= 1.5f;
+            }
             transform.position += new Vector3(_moveInputX, _moveInputY, 0f) * (speed * Time.deltaTime);
         }
 
-        private void Combat()
+        protected override bool CanAttack()
         {
-            if (Input.GetButtonDown("Fire1") && _canAttack)
-            {
-                Animator.SetTrigger(AttackTrigger);
-                StartCoroutine(CooldownAttack(cooldown));
-                StartCoroutine(ShootAfterDelay(0.5f));
-            }
+            return Input.GetButtonDown("Fire1");
+        }
+        
+        protected override void OnAttack()
+        {
+            StartCoroutine(ShootAfterDelay(0.5f));
         }
 
         private IEnumerator<WaitForSeconds> ShootAfterDelay(float delay)
@@ -59,14 +60,8 @@ namespace Entities
             Vector3 firePointPosition = firePoint.position;
             Vector2 direction = (mousePosition - firePointPosition).normalized;
             Projectile projectile = Instantiate(projectilePrefab, firePointPosition, firePoint.rotation);
+            projectile.Damage += damage;
             projectile.Launch(direction);
-        }
-        
-        private IEnumerator<WaitForSeconds> CooldownAttack(float delay)
-        {
-            _canAttack = false;
-            yield return new WaitForSeconds(delay);
-            _canAttack = true;
         }
     }
 }
