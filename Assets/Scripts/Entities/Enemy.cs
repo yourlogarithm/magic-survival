@@ -1,4 +1,5 @@
 using Combat;
+using TMPro;
 using UnityEngine;
 
 namespace Entities
@@ -8,6 +9,7 @@ namespace Entities
         [SerializeField] private DamagePopup damagePopupPrefab;
         [SerializeField] protected float viewDistance;
         [SerializeField] private Canvas canvas;
+        [SerializeField] private TextMeshProUGUI killCountText;
         
         private Player _player;
         private bool _triggered;
@@ -55,7 +57,7 @@ namespace Entities
 
         void MoveTowardsPlayer()
         {
-            if (Dead && _playerDead || !_triggered || KnockbackTime > 0 || CooledDown)
+            if (Dead || _playerDead || !_triggered || KnockbackTime > 0 || CooledDown)
             {
                 Animator_.SetBool(IsRunning, false);
                 return;
@@ -97,6 +99,12 @@ namespace Entities
             {
                 _playerDead = true;
             }
+        }
+
+        protected override void Die()
+        {
+            base.Die();
+            killCountText.text = (int.Parse(killCountText.text) + 1).ToString();
         }
     }
 }

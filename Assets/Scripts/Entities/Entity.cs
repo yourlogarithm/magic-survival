@@ -10,6 +10,7 @@ namespace Entities
         [SerializeField] protected float health;
         [SerializeField] protected float speed;
         [SerializeField] protected float damage;
+        [SerializeField] protected float destroyDelay = 3f;
 
 
         // ReSharper disable once InconsistentNaming
@@ -20,6 +21,8 @@ namespace Entities
         protected Renderer Renderer_;
         // ReSharper disable once InconsistentNaming
         protected Rigidbody2D Rigidbody2D_;
+        // ReSharper disable once InconsistentNaming
+        protected AudioSource AudioSource_;
 
         private float _knockbackCooldown = 0.1f;
         private float _knockbackTime;
@@ -53,6 +56,7 @@ namespace Entities
             Renderer_ = GetComponent<Renderer>();
             Rigidbody2D_ = GetComponent<Rigidbody2D>();
             SpriteRenderer_ = GetComponent<SpriteRenderer>();
+            AudioSource_ = GetComponent<AudioSource>();
             AnimationClip clip = Animator_.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip.name == "Death");
             if (clip != null)
                 _deathAnimationClipLength = clip.length;
@@ -72,7 +76,8 @@ namespace Entities
             health -= hit.Damage;
             ApplyKnockback(hit);
             StartCoroutine(PaintRed());
-            if (health <= 0)
+            AudioSource_.Play();
+            if (health <= 0 && !_dead)
                 Die();
         }
 
@@ -82,11 +87,11 @@ namespace Entities
             _knockbackTime = _knockbackCooldown;
         }
 
-        void Die()
+        protected virtual void Die()
         {
             _dead = true;
             Animator_.SetBool(IsDying, true);
-            Destroy(gameObject, _deathAnimationClipLength + 3f);
+            Destroy(gameObject, _deathAnimationClipLength + destroyDelay);
         }
     }
 }

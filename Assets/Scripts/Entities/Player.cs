@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Combat;
 using Projectiles;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Entities
 {
@@ -9,9 +11,20 @@ namespace Entities
         [SerializeField] private Transform firePoint;
         [SerializeField] private Projectile projectilePrefab;
         [SerializeField] private Camera mainCamera;
+        [SerializeField] private GameObject healthBar;
 
         private float _moveInputX;
         private float _moveInputY;
+        
+        private Slider _healthBarSlider;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _healthBarSlider = healthBar.GetComponent<Slider>();
+            _healthBarSlider.maxValue = health;
+            _healthBarSlider.value = health;
+        }
         
         protected void FixedUpdate()
         {
@@ -62,6 +75,12 @@ namespace Entities
             Projectile projectile = Instantiate(projectilePrefab, firePointPosition, firePoint.rotation);
             projectile.Damage += damage;
             projectile.Launch(direction);
+        }
+        
+        public override void TakeHit(Hit hit)
+        {
+            base.TakeHit(hit);
+            _healthBarSlider.value = health;
         }
     }
 }
