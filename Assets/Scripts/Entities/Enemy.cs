@@ -8,8 +8,8 @@ namespace Entities
     {
         [SerializeField] private DamagePopup damagePopupPrefab;
         [SerializeField] protected float viewDistance;
-        [SerializeField] private Canvas canvas;
-        [SerializeField] private TextMeshProUGUI killCountText;
+        [SerializeField] public Canvas canvas;
+        [SerializeField] public TextMeshProUGUI killCountText;
         
         private Player _player;
         private bool _triggered;

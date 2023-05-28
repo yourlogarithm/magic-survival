@@ -82,5 +82,12 @@ namespace Entities
             base.TakeHit(hit);
             _healthBarSlider.value = health;
         }
+
+        protected override void Die()
+        {
+            base.Die();
+            Debug.Log("death, will end game after " + destroyDelay + " seconds");
+            StartCoroutine(FindObjectOfType<GameStateManager>().EndGame(destroyDelay));
+        }
     }
 }

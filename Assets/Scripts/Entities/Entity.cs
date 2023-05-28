@@ -57,7 +57,7 @@ namespace Entities
             Rigidbody2D_ = GetComponent<Rigidbody2D>();
             SpriteRenderer_ = GetComponent<SpriteRenderer>();
             AudioSource_ = GetComponent<AudioSource>();
-            AnimationClip clip = Animator_.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip.name == "Death");
+            AnimationClip clip = Animator_.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip.name == "death");
             if (clip != null)
                 _deathAnimationClipLength = clip.length;
             else
